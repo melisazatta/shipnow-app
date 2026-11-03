@@ -3,12 +3,6 @@ import ProductService from "../services/product.service.js";
 class ProductController {
   constructor() {
     this.productService = new ProductService();
-
-    // this.getAll = this.getAll.bind(this);
-    // this.getById = this.getById.bind(this);
-    // this.create = this.create.bind(this);
-    // this.update = this.update.bind(this);
-    // this.delete = this.delete.bind(this);
   }
 
   getAll = async(req, res)=> {

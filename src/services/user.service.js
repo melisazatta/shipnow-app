@@ -1,9 +1,7 @@
-// import { config } from "dotenv"
 // import User from "../models/user.model.js"
 import { USER_ROLES } from "../constants/index.js"
 import UserRepository from "../repositories/user.repository.js"
 // import config from "../config/config.js"
-// import { ORDER_STATUS, ORDER_PRIORITY } from "../constants/index.js"
 
 class UserService {
 
