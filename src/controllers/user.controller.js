@@ -5,7 +5,7 @@ class UserController{
         this.UserService = new UserService()
     }
 
-    async getAll(req, res){
+     getAll = async(req, res)=>{
         try{
             const users = await this.UserService.getAll()
             return res.status(200).json({
@@ -21,7 +21,7 @@ class UserController{
         }
     }
 
-    async getUserById(req, res){
+    getUserById = async(req, res)=>{
         try{
             const user = await this.UserService.getUserById(req.params.id)
             return res.status(200).json({
@@ -37,7 +37,7 @@ class UserController{
         }
     }
 
-    async create(req, res){
+    create = async(req, res)=>{
         try{
             const user = await this.UserService.create(req.body)
             return res.status(200).json({
@@ -53,7 +53,7 @@ class UserController{
         }
     }
 
-    async update(req, res){
+    update = async(req, res)=>{
         try{
             const user = await this.UserService.update(req.params.id, req.body)
             return res.status(200).json({
@@ -69,7 +69,7 @@ class UserController{
         }
     }
 
-    async delete(req, res){
+    delete = async(req, res)=>{
         try{
             const user = await this.UserService.delete(req.params.id)
             return res.status(200).json({

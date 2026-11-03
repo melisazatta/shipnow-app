@@ -11,7 +11,7 @@ class ProductController {
     // this.delete = this.delete.bind(this);
   }
 
-  async getAll(req, res) {
+  getAll = async(req, res)=> {
     try {
       const products = await this.productService.getAll(req.query);
 
@@ -27,7 +27,7 @@ class ProductController {
     }
   }
 
-  async getById(req, res) {
+  getById = async (req, res)=> {
     try {
       const product = await this.productService.getProductById(req.params.id);
 
@@ -45,7 +45,7 @@ class ProductController {
     }
   }
 
-  async create(req, res) {
+  create = async (req, res)=> {
     try {
       const product = await this.productService.create(req.body);
 
@@ -62,7 +62,7 @@ class ProductController {
     }
   }
 
-  async update(req, res) {
+  update = async (req, res)=> {
     try {
       const product = await this.productService.update(
         req.params.id,
@@ -84,7 +84,7 @@ class ProductController {
     }
   }
 
-  async delete(req, res) {
+  delete = async (req, res)=> {
     try {
       const product = await this.productService.delete(req.params.id);
 

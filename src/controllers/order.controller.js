@@ -5,7 +5,7 @@ class OrderController{
         this.OrderService = new OrderService()
     }
 
-    async getAll(req, res){
+    getAll = async (req, res)=>{
         try{
             const orders = await this.OrderService.getAll()
             return res.status(200).json({
@@ -21,7 +21,7 @@ class OrderController{
         }
     }
 
-    async getOrderById(req, res){
+    getOrderById = async (req, res)=>{
         try{
             const order = await this.OrderService.getOrderById(req.params.id)
             return res.status(200).json({
@@ -37,7 +37,7 @@ class OrderController{
         }
     }
 
-    async create(req, res){
+    create = async (req, res)=>{
         try{
             const order = await this.OrderService.create(req.body)
             return res.status(200).json({
@@ -53,7 +53,7 @@ class OrderController{
         }
     }
 
-    async update(req, res){
+    update = async (req, res)=>{
         try{
             const order = await this.OrderService.update(req.params.id, req.body)
             return res.status(200).json({
@@ -69,7 +69,7 @@ class OrderController{
         }
     }
 
-    async delete(req, res){
+    delete = async (req, res)=>{
         try{
             const order = await this.OrderService.delete(req.params.id)
             return res.status(200).json({
