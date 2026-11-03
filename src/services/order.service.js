@@ -1,14 +1,17 @@
 // import { config } from "dotenv"
-import User from "../models/user.model.js"
+// import User from "../models/user.model.js"
 import OrderRepository from "../repositories/order.repository.js"
 import config from "../config/config.js"
 import { ORDER_STATUS, ORDER_PRIORITY } from "../constants/index.js"
+import UserRepository from "../repositories/user.repository.js"
 
 class OrderService {
 
     constructor(){
-    this.orderRepository = new OrderRepository()  
-    }
+    this.orderRepository = new OrderRepository()
+    this.UserRepository = new UserRepository()
+    
+}
 
     async getAll(filter){
         return await this.orderRepository.findAll(filter)
@@ -32,13 +35,13 @@ class OrderService {
         }
 
         //traer User desde repository
-        const existantCustomer = await User.findById(customer)
+        const existantCustomer = await this.UserRepository.findById(customer)
         if(!existantCustomer){
             throw new Error("Cliente no encontrado.")
         }
 
         const total = items.reduce((acc, item)=>{
-            return acc + item.price * quantity
+            return acc + item.price * item.quantity
         }, 0)
 
         const shippingCost = this.calculateShippingCost({
