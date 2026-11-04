@@ -56,12 +56,12 @@ Router: /api/mocks.
 
 Permite generar datos ficticios sin guardarlos en MongoDB y cargar datos de prueba mediante un seed.
 
-Método	Ruta	Descripción
-GET	/api/mocks/users?qty=2	Genera usuarios
-GET	/api/mocks/drivers?qty=2	Genera repartidores
-GET	/api/mocks/orders?qty=2	Genera pedidos
-GET	/api/mocks/deliveries?qty=2	Genera entregas
-POST	/api/mocks/seed?qty=10	Inserta usuarios, pedidos y entregas en MongoDB
+Endpoints
+GET /api/mocks/users?qty=2: genera usuarios.
+GET /api/mocks/drivers?qty=2: genera repartidores.
+GET /api/mocks/orders?qty=2: genera pedidos.
+GET /api/mocks/deliveries?qty=2: genera entregas.
+POST /api/mocks/seed?qty=10: inserta usuarios, pedidos y entregas en MongoDB.
 
 El parámetro qty es opcional. Por defecto genera 10 registros y permite un máximo de 50.
 
@@ -70,12 +70,12 @@ Los datos respetan los modelos y constantes del proyecto:
 Usuarios con roles válidos.
 Pedidos con estados y prioridades permitidos.
 Entregas relacionadas con sus pedidos y repartidores.
+Contraseñas almacenadas con hash bcrypt.
+
 Los pedidos cancelados no generan entregas, por lo que la cantidad de entregas puede ser menor que la cantidad de pedidos.
 
 Ejemplos
 bash
 curl "http://localhost:8080/api/mocks/users?qty=2"
-
 curl "http://localhost:8080/api/mocks/orders?qty=5"
-
 curl -X POST "http://localhost:8080/api/mocks/seed?qty=10"
