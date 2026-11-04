@@ -2,11 +2,11 @@ import Order from "../models/order.model.js";
 
 class OrderRepository {
     async findAll(filter = {}){
-        return Order.find(filter).populate("costumer", "firstName lastName email").populate("delivery")
+        return Order.find(filter).populate("customer", "firstName lastName email").populate("delivery")
     }
 
     async findById(id){
-        return Order.findById(id).populate("costumer", "firstName lastName email").populate("delivery")
+        return Order.findById(id).populate("customer", "firstName lastName email").populate("delivery")
     }
 
     async create(orderData){
@@ -21,6 +21,17 @@ class OrderRepository {
         return Order.findByIdAndDelete(id)
     }
 
+    async insertMany(orderData) {
+        return Order.insertMany(orderData)
+    }
+
+    async linkDelivery(orderId, deliveryId) {
+    return Order.findByIdAndUpdate(
+        orderId,
+        { delivery: deliveryId },
+        { new: true }
+    );
+}
 }
 
 export default OrderRepository

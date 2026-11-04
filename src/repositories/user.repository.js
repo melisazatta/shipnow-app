@@ -25,6 +25,9 @@ class UserRepository {
         return User.findByIdAndDelete(id).select("-password")
     }
 
+    async insertMany(usersData){
+        return User.insertMany(usersData)
+    }
 }
 
 export default UserRepository

@@ -28,3 +28,17 @@ export const PRODUCT_STATUS = Object.freeze({
   AVAILABLE: "available",
   OUT_OF_STOCK: "out_of_stock"
 });
+
+export const MOCKING_PARAMETERS = Object.freeze({
+  MAX: 50,
+  DEFAULT: 10,
+  DEFAULT_PASSWORD: "coder123"
+})
+
+
+export const DELIVERY_STATUS = Object.freeze({
+  PENDING: "pending",
+  ASSIGNED: "assigned",
+  IN_TRANSIT: "in_transit",
+  DELIVERED: "delivered"
+})
