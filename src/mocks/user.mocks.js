@@ -36,11 +36,8 @@ export const generateMockUsers = (qty) => {
         } else {
             usersData.push(generateMockUser());
         }
-        // usersData.push(generateMockUser())
     }
 
     return usersData
 
 }
-
-// console.log(generateMockUsers(3))

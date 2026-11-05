@@ -1,7 +1,6 @@
-// import User from "../models/user.model.js"
+
 import { USER_ROLES } from "../constants/index.js"
 import UserRepository from "../repositories/user.repository.js"
-// import config from "../config/config.js"
 
 class UserService {
 
@@ -76,6 +75,10 @@ class UserService {
     
 }
 
+export default UserService
+
+
+
+
 //Hashear password - bcrypt / no actualizar pass y role
 
-export default UserService

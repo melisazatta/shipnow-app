@@ -1,5 +1,4 @@
-// import { config } from "dotenv"
-// import User from "../models/user.model.js"
+
 import OrderRepository from "../repositories/order.repository.js"
 import config from "../config/config.js"
 import { ORDER_STATUS, ORDER_PRIORITY } from "../constants/index.js"
@@ -10,9 +9,7 @@ class OrderService {
     constructor(){
     this.orderRepository = new OrderRepository()
     this.UserRepository = new UserRepository()
-    
 }
-
     async getAll(filter){
         return await this.orderRepository.findAll(filter)
     }

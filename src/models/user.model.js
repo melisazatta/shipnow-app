@@ -27,9 +27,6 @@ const userSchema = new mongoose.Schema({
     type: String,
      enum: Object.values(USER_ROLES),
      default: USER_ROLES.CUSTOMER
-
-    // enum: ['admin', 'customer', 'driver', 'store'],
-    // default: 'customer'
   },
   documents: {
     type: [
