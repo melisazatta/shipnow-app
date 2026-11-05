@@ -4,7 +4,9 @@ import config from "./config/config.js"
 
 async function startServer() {
     try {
-        await mongoose.connect(config.mongoUri)
+        await mongoose.connect(config.mongoUri, {
+    serverSelectionTimeoutMS: 3000
+})
         console.log("Base de datos conectada.")
 
         app.listen(config.port, ()=> {
