@@ -3,6 +3,7 @@ import OrderRepository from "../repositories/order.repository.js"
 import config from "../config/config.js"
 import { ORDER_STATUS, ORDER_PRIORITY } from "../constants/index.js"
 import UserRepository from "../repositories/user.repository.js"
+import { ErrorDictionary, createError } from "../utils/errors.js"
 
 class OrderService {
 
@@ -18,7 +19,7 @@ class OrderService {
         const order = await this.orderRepository.findById(id)
 
         if(!order){
-            throw new Error("Orden no encontrada.")
+           throw createError(ErrorDictionary.ORDER_NOT_FOUND)
         }
         return order
     }
@@ -26,15 +27,15 @@ class OrderService {
     async create(orderData){
         const { customer, deliveryAddress, items } = orderData
 
-        if(!customer || !deliveryAddress || !items || items.length < 1){
-            throw new Error("Falta información requerida.")
+        if(!customer || !deliveryAddress || !Array.isArray(items) || items.length < 1){
+            throw createError(ErrorDictionary.MISSING_REQUIRED_FIELDS)
 
         }
 
         //traer User desde repository
         const existantCustomer = await this.UserRepository.findById(customer)
         if(!existantCustomer){
-            throw new Error("Cliente no encontrado.")
+            throw createError(ErrorDictionary.USER_NOT_FOUND)
         }
 
         const total = items.reduce((acc, item)=>{
@@ -56,9 +57,14 @@ class OrderService {
     }
 
     async update(id, orderData){
+
+        if (orderData.status !== undefined && !Object.values(ORDER_STATUS).includes(orderData.status)) {
+        throw createError(ErrorDictionary.INVALID_STATUS)
+    }
+
         const updatedOrder = await this.orderRepository.update(id, orderData)
         if(!updatedOrder){
-            throw new Error("Pedido no encontrado.")
+             throw createError(ErrorDictionary.ORDER_NOT_FOUND)
         }
         return updatedOrder
     }
@@ -66,14 +72,14 @@ class OrderService {
     async delete(id){
         const deletedOrder = await this.orderRepository.delete(id)
         if(!deletedOrder){
-            throw new Error("Pedido no encontrado.")
+             throw createError(ErrorDictionary.ORDER_NOT_FOUND)
         }
         return deletedOrder
     }
 
     calculateShippingCost({isProduction, shipmentValue, apiKey}){
         if(!apiKey){
-            throw new Error("ApiKey invalida.")
+             throw createError(ErrorDictionary.MISSING_API_KEY)
         }
         if(isProduction){
             return 50 + shipmentValue * 0.01

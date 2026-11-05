@@ -6,6 +6,8 @@ import deliveriesRouter from './routes/deliveries.js'
 
 import mocksRouter from './routes/mocks.js'
 import config from './config/config.js'
+import { errorHandler } from './middlewares/errorHandler.js'
+import { routeNotFoundHandle } from './middlewares/routeNotFoundHandle.js'
 
 const app = express()
 
@@ -20,6 +22,10 @@ app.use("/api/deliveries", deliveriesRouter);
 // if(config.environment == "development"){
    app.use("/api/mocks", mocksRouter) 
 // }
+
+app.use(routeNotFoundHandle)
+
+app.use(errorHandler)
 
 
 export default app

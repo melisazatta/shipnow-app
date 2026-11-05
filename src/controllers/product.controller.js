@@ -5,7 +5,7 @@ class ProductController {
     this.productService = new ProductService();
   }
 
-  getAll = async(req, res)=> {
+  getAll = async(req, res, next)=> {
     try {
       const products = await this.productService.getAll(req.query);
 
@@ -13,15 +13,12 @@ class ProductController {
         status: "success",
         payload: products,
       });
-    } catch (error) {
-      return res.status(500).json({
-        status: "error",
-        message: error.message,
-      });
-    }
+    } catch (error) { 
+            next(error) 
+        }
   }
 
-  getById = async (req, res)=> {
+  getById = async (req, res, next)=> {
     try {
       const product = await this.productService.getProductById(req.params.id);
 
@@ -29,17 +26,12 @@ class ProductController {
         status: "success",
         payload: product,
       });
-    } catch (error) {
-      const statusCode = error.message === "Producto no encontrado." ? 404 : 500;
-
-      return res.status(statusCode).json({
-        status: "error",
-        message: error.message,
-      });
-    }
+    } catch (error) { 
+            next(error) 
+        }
   }
 
-  create = async (req, res)=> {
+  create = async (req, res, next)=> {
     try {
       const product = await this.productService.create(req.body);
 
@@ -48,15 +40,12 @@ class ProductController {
         message: "Producto creado correctamente.",
         payload: product,
       });
-    } catch (error) {
-      return res.status(400).json({
-        status: "error",
-        message: error.message,
-      });
-    }
+    } catch (error) { 
+            next(error) 
+        }
   }
 
-  update = async (req, res)=> {
+  update = async (req, res, next)=> {
     try {
       const product = await this.productService.update(
         req.params.id,
@@ -68,17 +57,12 @@ class ProductController {
         message: "Producto actualizado correctamente.",
         payload: product,
       });
-    } catch (error) {
-      const statusCode = error.message === "Producto no encontrado." ? 404 : 400;
-
-      return res.status(statusCode).json({
-        status: "error",
-        message: error.message,
-      });
-    }
+    } catch (error) { 
+            next(error) 
+        }
   }
 
-  delete = async (req, res)=> {
+  delete = async (req, res, next)=> {
     try {
       const product = await this.productService.delete(req.params.id);
 
@@ -87,14 +71,9 @@ class ProductController {
         message: "Producto eliminado correctamente.",
         payload: product,
       });
-    } catch (error) {
-      const statusCode = error.message === "Producto no encontrado." ? 404 : 500;
-
-      return res.status(statusCode).json({
-        status: "error",
-        message: error.message,
-      });
-    }
+    } catch (error) { 
+            next(error) 
+        }
   }
 }
 

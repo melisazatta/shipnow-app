@@ -1,6 +1,7 @@
 
 import { USER_ROLES } from "../constants/index.js"
 import UserRepository from "../repositories/user.repository.js"
+import { createError, ErrorDictionary } from "../utils/errors.js"
 
 class UserService {
 
@@ -16,7 +17,7 @@ class UserService {
         const user = await this.userRepository.findById(id)
 
         if(!user){
-            throw new Error("Usuario no encontrado.")
+            throw createError(ErrorDictionary.USER_NOT_FOUND)
         }
         return user
     }
@@ -25,7 +26,7 @@ class UserService {
         const { firstName, lastName, email, password } = userData
 
         if(!firstName || !lastName || !email || !password){
-            throw new Error("Falta información requerida.")
+            throw createError(ErrorDictionary.MISSING_REQUIRED_FIELDS)
 
         }
 
@@ -35,11 +36,7 @@ class UserService {
       await this.userRepository.findByEmail(normalizedEmail);
 
     if (existingUser) {
-      const error = new Error(
-        "El email ya está registrado."
-      );
-      error.statusCode = 409;
-      throw error;
+       throw createError(ErrorDictionary.USER_ALREADY_EXISTS)
     }
 
      const newUser = await this.userRepository.create({
@@ -60,7 +57,7 @@ class UserService {
     async update(id, userData){
         const updatedUser = await this.userRepository.update(id, userData)
         if(!updatedUser){
-            throw new Error("Usuario no encontrado.")
+             throw createError(ErrorDictionary.USER_NOT_FOUND)
         }
         return updatedUser
     }
@@ -68,7 +65,7 @@ class UserService {
     async delete(id){
         const deletedUser = await this.userRepository.delete(id)
         if(!deletedUser){
-            throw new Error("Usuario no encontrado.")
+             throw createError(ErrorDictionary.USER_NOT_FOUND)
         }
         return deletedUser
     }
@@ -81,4 +78,3 @@ export default UserService
 
 
 //Hashear password - bcrypt / no actualizar pass y role
-

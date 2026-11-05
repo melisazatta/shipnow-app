@@ -5,7 +5,7 @@ class OrderController{
         this.OrderService = new OrderService()
     }
 
-    getAll = async (req, res)=>{
+    getAll = async (req, res, next)=>{
         try{
             const orders = await this.OrderService.getAll()
             return res.status(200).json({
@@ -13,15 +13,12 @@ class OrderController{
                 message: "Ordenes obtenidas exitosamente",
                 payload: orders
             })
-        } catch (error) {
-            return res.status(500).json({
-                status: "error",
-                message: "internal server error: " + error.message
-            })
+        } catch (error) { 
+            next(error) 
         }
     }
 
-    getOrderById = async (req, res)=>{
+    getOrderById = async (req, res, next)=>{
         try{
             const order = await this.OrderService.getOrderById(req.params.id)
             return res.status(200).json({
@@ -29,31 +26,25 @@ class OrderController{
                 message: "Orden obtenida exitosamente",
                 payload: order
             })
-        } catch (error) {
-            return res.status(500).json({
-                status: "error",
-                message: "internal server error: " + error.message
-            })
+        } catch (error) { 
+            next(error) 
         }
     }
 
-    create = async (req, res)=>{
+    create = async (req, res, next)=>{
         try{
             const order = await this.OrderService.create(req.body)
-            return res.status(200).json({
+            return res.status(201).json({
                 status: "success",
                 message: "Orden creada exitosamente",
                 payload: order
             })
-        } catch (error) {
-            return res.status(500).json({
-                status: "error",
-                message: "internal server error: " + error.message
-            })
+        } catch (error) { 
+            next(error) 
         }
     }
 
-    update = async (req, res)=>{
+    update = async (req, res, next)=>{
         try{
             const order = await this.OrderService.update(req.params.id, req.body)
             return res.status(200).json({
@@ -61,15 +52,12 @@ class OrderController{
                 message: "Orden actualizada exitosamente",
                 payload: order
             })
-        } catch (error) {
-            return res.status(500).json({
-                status: "error",
-                message: "internal server error: " + error.message
-            })
+        } catch (error) { 
+            next(error) 
         }
     }
 
-    delete = async (req, res)=>{
+    delete = async (req, res, next)=>{
         try{
             const order = await this.OrderService.delete(req.params.id)
             return res.status(200).json({
@@ -77,11 +65,8 @@ class OrderController{
                 message: "Orden borrada exitosamente",
                 payload: order
             })
-        } catch (error) {
-            return res.status(500).json({
-                status: "error",
-                message: "internal server error: " + error.message
-            })
+        } catch (error) { 
+            next(error) 
         }
     }
 }

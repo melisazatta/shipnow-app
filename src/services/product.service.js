@@ -1,5 +1,6 @@
 import ProductRepository from "../repositories/product.repository.js";
 import { PRODUCT_STATUS } from "../constants/index.js";
+import { ErrorDictionary, createError } from "../utils/errors.js";
 
 class ProductService {
   constructor() {
@@ -14,7 +15,7 @@ class ProductService {
     const product = await this.productRepository.findById(id);
 
     if (!product) {
-      throw new Error("Producto no encontrado.");
+      throw createError(ErrorDictionary.PRODUCT_NOT_FOUND)
     }
 
     return product;
@@ -24,16 +25,12 @@ class ProductService {
     const { name, description, price, stock } = productData;
 
     if (!name || price === undefined || stock === undefined) {
-      throw new Error("Falta información requerida.");
+      throw createError(ErrorDictionary.MISSING_REQUIRED_FIELDS)
     }
 
-    if (price < 0) {
-      throw new Error("El precio no puede ser negativo.");
-    }
+     if (typeof price !== "number" || Number.isNaN(price) || price < 0) { throw createError(ErrorDictionary.INVALID_PRICE) }
 
-    if (stock < 0) {
-      throw new Error("El stock no puede ser negativo.");
-    }
+     if (typeof stock !== "number" || Number.isNaN(stock) || stock < 0) { throw createError(ErrorDictionary.INVALID_STOCK) }
 
     const status =
       stock > 0
@@ -51,13 +48,13 @@ class ProductService {
 
   async update(id, productData) {
     const { name, description, price, stock } = productData;
-
-    if (price !== undefined && price < 0) {
-      throw new Error("El precio no puede ser negativo.");
+    
+    if (price !== undefined && (typeof price !== "number" || Number.isNaN(price) || price < 0)) {
+    throw createError(ErrorDictionary.INVALID_PRICE)
     }
 
-    if (stock !== undefined && stock < 0) {
-      throw new Error("El stock no puede ser negativo.");
+    if (stock !== undefined && (typeof stock !== "number" || Number.isNaN(stock) || stock < 0)) {
+    throw createError(ErrorDictionary.INVALID_STOCK)
     }
 
     const dataToUpdate = {
@@ -80,7 +77,7 @@ class ProductService {
     );
 
     if (!updatedProduct) {
-      throw new Error("Producto no encontrado.");
+      throw createError(ErrorDictionary.PRODUCT_NOT_FOUND)
     }
 
     return updatedProduct;
@@ -90,7 +87,7 @@ class ProductService {
     const deletedProduct = await this.productRepository.delete(id);
 
     if (!deletedProduct) {
-      throw new Error("Producto no encontrado.");
+      throw createError(ErrorDictionary.PRODUCT_NOT_FOUND)
     }
 
     return deletedProduct;

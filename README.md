@@ -83,4 +83,37 @@ El parámetro `qty` es opcional. Por defecto genera 10 registros y permite un m�
 
 - "http://localhost:8080/api/mocks/users?qty=2"
 - "http://localhost:8080/api/mocks/orders?qty=5"
-- "http://localhost:8080/api/mocks/seed?qty=10"
+- POST "http://localhost:8080/api/mocks/seed?qty=10"
+
+## Manejo de errores
+
+Los errores se detectan en los Services (con errores personalizados del diccionario en `utils/errors.js`) y la respuesta al cliente sale únicamente del middleware global `errorHandler`.
+
+### Estructura de la respuesta de error
+
+```json
+{
+  "status": "error",
+  "error": {
+    "name": "InvalidQuantity",
+    "code": 6,
+    "message": "qty debe ser mayor a 0"
+  }
+}
+```
+
+- `name`: identifica el error (ej. `UserNotFound`, `InvalidQuantity`).
+- `code`: categoría (`1` ruta, `2` tipo inválido, `3` base de datos, `4` no encontrado, `5` ya existe, `6` propiedad inválida, `7` configuración).
+- `message`: descripción legible. El status HTTP coincide con el del diccionario.
+
+### Cómo probar los casos inválidos
+
+| Request | Status | `name` |
+|---|---|---|
+| `GET /api/mocks/users?qty=abc` | 400 | `InvalidQuantity` |
+| `GET /api/mocks/users?qty=-5` | 400 | `InvalidQuantity` |
+| `GET /api/mocks/users?qty=999` | 400 | `InvalidQuantity` |
+| `POST /api/mocks/seed` con MongoDB caído | 500 | `DatabaseError` |
+| `GET /api/users/<id inexistente>` | 404 | `UserNotFound` |
+| `POST /api/products` con `price: -5` | 400 | `InvalidPrice` |
+| `GET /api/ruta-inexistente` | 404 | `RouteNotFound` |
