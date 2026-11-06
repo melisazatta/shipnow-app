@@ -6,12 +6,12 @@ const mockeables_roles = [
     USER_ROLES.DRIVER,
     USER_ROLES.STORE
 ]
-export const generateMockUser = () => {
+export const generateMockUser = (role = faker.helpers.arrayElement(mockeables_roles)) => {
 
     const firstName = faker.person.firstName()
     const lastName = faker.person.lastName()
     const email = faker.internet.email((firstName, lastName).toLocaleLowerCase())
-    const role = faker.helpers.arrayElement(mockeables_roles)
+    // const role = faker.helpers.arrayElement(mockeables_roles)
     const defaultPassword = MOCKING_PARAMETERS.DEFAULT_PASSWORD
     const user = {
         firstName,

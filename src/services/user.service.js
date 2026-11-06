@@ -2,6 +2,7 @@
 import { USER_ROLES } from "../constants/index.js"
 import UserRepository from "../repositories/user.repository.js"
 import { createError, ErrorDictionary } from "../utils/errors.js"
+import logger from "../utils/logger.js"
 
 class UserService {
 
@@ -14,6 +15,8 @@ class UserService {
     }
 
     async getUserById(id){
+        logger.debug(`Buscando usuario con ID: ${id}`)
+        //  throw new Error (XD)
         const user = await this.userRepository.findById(id)
 
         if(!user){
@@ -46,6 +49,8 @@ class UserService {
       password,
       role: USER_ROLES.CUSTOMER
     });
+
+    logger.info(`Usuario creado: ${newUser._id}`)
 
     /////////
      const userObject = newUser.toObject();

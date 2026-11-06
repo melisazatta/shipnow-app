@@ -117,3 +117,35 @@ Los errores se detectan en los Services (con errores personalizados del dicciona
 | `GET /api/users/<id inexistente>` | 404 | `UserNotFound` |
 | `POST /api/products` con `price: -5` | 400 | `InvalidPrice` |
 | `GET /api/ruta-inexistente` | 404 | `RouteNotFound` |
+
+## Logging
+
+Se usa **Winston** como logger centralizado (`src/utils/logger.js`), con rotación diaria de archivos mediante `winston-daily-rotate-file`.
+
+### Niveles
+
+De mayor a menor gravedad: `fatal`, `error`, `warning`, `info`, `http`, `debug`.
+
+El logger registra el nivel configurado y todos los más graves.
+
+### Cómo probarlo
+
+`GET /api/logger` genera un log de cada nivel. Aparecen en consola y, además, `error` y `fatal` se guardan en el archivo de errores.
+
+También se registran: inicio del servidor, conexión a MongoDB, creación de usuarios y pedidos, generación de mocks y errores capturados por el middleware global (4xx como `warning`, 5xx como `error`).
+
+### Archivos de logs
+
+- Ruta: `logs/errors-AAAA-MM-DD.log`.
+- Contienen solo los niveles `error` y `fatal`.
+- Rotación diaria, conservando 14 días.
+- `logs/` y `*.log` están en `.gitignore`: los archivos generados no se suben al repositorio.
+
+### Según el entorno
+
+| Entorno | Nivel por defecto | Formato de consola |
+|---|---|---|
+| `development` | `debug` | Texto legible con colores |
+| `production` | `info` | JSON |
+
+La variable opcional `LOG_LEVEL` fuerza un nivel y tiene prioridad sobre el entorno.

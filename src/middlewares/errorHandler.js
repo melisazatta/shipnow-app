@@ -1,4 +1,5 @@
 import {createError, ErrorDictionary} from "../utils/errors.js"
+import logger from "../utils/logger.js"
 
 export const errorHandler = (err,req,res,next) =>{
     //Id de Mongo mal formado
@@ -20,7 +21,20 @@ if (err.code === 11000) {
 err = createError(ErrorDictionary.DUPLICATE_KEY)
 }
 
-    res.status(err.status ? err.status : 500).json({
+const status = err.status ?? 500
+const meta = {
+    requestId: req?.requestId ?? "",
+    method: req?.method ?? "",
+    path: req.originalUrl,
+    code: err.code ?? 0 
+}
+
+if(status >=500){
+     logger.error(`${err.name} - ${err.message}`, {...meta, stack: err.stack})
+}else{
+    logger.warning(`${err.name} - ${err.message}`, meta)
+}
+    res.status(status).json({
         status:"error",
         error:{
             name: err.name ? err.name : "InternalError",

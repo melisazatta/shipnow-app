@@ -14,7 +14,8 @@ const config = {
     port: Number(process.env.PORT),
     mongoUri: process.env.MONGODB_URI,
     jwtSecret: process.env.JWT_SECRET,
-    environment: process.env.NODE_ENV
+    environment: process.env.NODE_ENV,
+    logLevel: process.env.LOG_LEVEL || (process.env.NODE_ENV === "production" ? "info" : "debug")
 }
 
 export default config
