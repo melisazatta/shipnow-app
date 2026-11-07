@@ -130,7 +130,7 @@ El logger registra el nivel configurado y todos los más graves.
 
 ### Cómo probarlo
 
-`GET /api/logger` genera un log de cada nivel. Aparecen en consola y, además, `error` y `fatal` se guardan en el archivo de errores.
+`GET /api/loggerTest` genera un log de cada nivel. Aparecen en consola y, además, `error` y `fatal` se guardan en el archivo de errores.
 
 También se registran: inicio del servidor, conexión a MongoDB, creación de usuarios y pedidos, generación de mocks y errores capturados por el middleware global (4xx como `warning`, 5xx como `error`).
 
@@ -149,3 +149,13 @@ También se registran: inicio del servidor, conexión a MongoDB, creación de us
 | `production` | `info` | JSON |
 
 La variable opcional `LOG_LEVEL` fuerza un nivel y tiene prioridad sobre el entorno.
+
+## Documentación de API (Swagger)
+
+La API cuenta con documentación interactiva mediante Swagger UI, disponible en:
+
+`http://localhost:8080/api/docs`
+
+Permite consultar y probar los endpoints de los módulos **Users, Orders, Deliveries, Mocks y Logger**, incluyendo parámetros, cuerpos de petición, respuestas y errores.
+
+La documentación utiliza OpenAPI y schemas reutilizables.

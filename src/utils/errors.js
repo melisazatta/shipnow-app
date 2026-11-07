@@ -15,6 +15,8 @@ export const ErrorDictionary = {
 
   ORDER_NOT_FOUND: {name:"OrderNotFound", code:EErrors.NOT_FOUND_ERROR, status: 404, message:"Pedido no encontrado" },
 
+  DELIVERY_NOT_FOUND: {name:"DeliveryNotFound", code:EErrors.NOT_FOUND_ERROR, status: 404, message:"Entrega no encontrada" },
+
   INVALID_STATUS: {name:"InvalidStatus", code:EErrors.INVALID_TYPES_ERROR, status: 400, message:"Estado de pedido invalido" },
 
   ADMIN_CREATION_FORBIDDEN:{name:"AdminCreationForbidden", code:EErrors.INVALID_RESOURSE_PROPERTY, status: 403, message:"No se puede crear un admin desde este endpoint"},

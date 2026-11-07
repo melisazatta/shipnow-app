@@ -10,6 +10,8 @@ import { errorHandler } from './middlewares/errorHandler.js'
 import { routeNotFoundHandle } from './middlewares/routeNotFoundHandle.js'
 import { loggerHttp } from './middlewares/HttpLogger.js'
 import loggerRouter from './routes/logger.js'
+import swaggerUI from "swagger-ui-express"
+import swaggerSpec from "./config/swagger.js"
 
 const app = express()
 
@@ -17,13 +19,14 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true}))
 
 app.use(loggerHttp)
+app.use("/api/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec))
 
 app.use("/api/users", usersRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/orders", ordersRouter);
 app.use("/api/deliveries", deliveriesRouter);
 
-app.use("/api/logger", loggerRouter)
+app.use("/api/loggerTest", loggerRouter)
 
 // if(config.environment == "development"){
    app.use("/api/mocks", mocksRouter) 
