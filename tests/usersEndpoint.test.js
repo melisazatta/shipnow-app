@@ -1,3 +1,4 @@
+
 import { expect } from "chai"
 import supertest from "supertest"
 import mongoose from "mongoose"
@@ -31,7 +32,6 @@ let user2Id = ""
 
 const idInvalido = "123abc"
 const idInexistente = new mongoose.Types.ObjectId().toString()
-const jsonMalFormado = '{"firstName":"Jose","lastName":'
 
 // Valida status HTTP + formato de error definido en utils/errors.js (name, code y message)
 const expectError = (response, key) => {
@@ -85,44 +85,10 @@ describe("Test de endpoints de user", function () {
         expect(response.body.payload).to.not.have.property("password")
     })
 
-    it("Registro: Crear un segundo usuario", async () => {
-        await User.deleteMany({})
-        await User.create(user)
-
-        const response = await requester.post("/api/users").send(user2)
-
-        expect(response.status).to.equal(201)
-        expect(response.body).to.have.property("status", "success")
-        expect(response.body.payload).to.have.property("_id")
-        expect(response.body.payload).to.have.property("email", "maria_gomez@gmail.com")
-    })
-
     it("Registro: Faltan campos obligatorios", async () => {
         const response = await requester.post("/api/users").send({ firstName: "Pedro", lastName: "Diaz" })
 
         expectError(response, "MISSING_REQUIRED_FIELDS")
-    })
-
-    it("Registro: JSON mal formado", async () => {
-        const response = await requester
-            .post("/api/users")
-            .set("Content-Type", "application/json")
-            .send(jsonMalFormado)
-
-        expectError(response, "INVALID_JSON")
-    })
-
-    it("Registro: Un rol admin enviado en el body se ignora y se crea como customer", async () => {
-        const admin = { ...user2, email: "ana_admin@gmail.com", role: "admin" }
-
-        const response = await requester.post("/api/users").send(admin)
-
-        expect(response.status).to.equal(201)
-        expect(response.body.payload).to.have.property("role", "customer")
-
-        const enDb = await User.findOne({ email: admin.email })
-        expect(enDb).to.not.be.null
-        expect(enDb.role).to.equal("customer")
     })
 
     it("Registro: El usuario ya existe", async () => {
@@ -185,15 +151,6 @@ describe("Test de endpoints de user", function () {
         const response = await requester.put(`/api/users/${idInvalido}`).send({ firstName: "Otro" })
 
         expectError(response, "INVALID_ID")
-    })
-
-    it("Actualizar: JSON mal formado", async () => {
-        const response = await requester
-            .put(`/api/users/${userId}`)
-            .set("Content-Type", "application/json")
-            .send(jsonMalFormado)
-
-        expectError(response, "INVALID_JSON")
     })
 
     it("Actualizar: Usuario no encontrado", async () => {

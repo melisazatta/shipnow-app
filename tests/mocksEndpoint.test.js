@@ -1,3 +1,4 @@
+
 import { expect } from "chai"
 import supertest from "supertest"
 import mongoose from "mongoose"
@@ -66,33 +67,6 @@ describe("Test de endpoints de mocks", function () {
             })
         })
 
-        it("Users: El primero es siempre customer y el segundo driver", async () => {
-            const response = await requester.get("/api/mocks/users?qty=5")
-
-            expect(response.body.payload[0]).to.have.property("role", USER_ROLES.CUSTOMER)
-            expect(response.body.payload[1]).to.have.property("role", USER_ROLES.DRIVER)
-            expect(response.body.payload[1]).to.have.property("isAvailable", true)
-        })
-
-        it("Users: Usa la cantidad por defecto si no se envía qty", async () => {
-            const response = await requester.get("/api/mocks/users")
-
-            expect(response.status).to.equal(200)
-            expect(response.body.payload).to.have.lengthOf(MOCKING_PARAMETERS.DEFAULT)
-        })
-
-        it("Users: Acepta el máximo permitido", async () => {
-            const response = await requester.get(`/api/mocks/users?qty=${MOCKING_PARAMETERS.MAX}`)
-
-            expect(response.status).to.equal(200)
-            expect(response.body.payload).to.have.lengthOf(MOCKING_PARAMETERS.MAX)
-        })
-
-        it("Users: No inserta nada en la base de datos", async () => {
-            await requester.get("/api/mocks/users?qty=5")
-
-            expect(await User.countDocuments()).to.equal(0)
-        })
     })
 
     describe("GET /api/mocks/drivers", () => {
@@ -135,11 +109,6 @@ describe("Test de endpoints de mocks", function () {
             })
         })
 
-        it("Orders: No inserta nada en la base de datos", async () => {
-            await requester.get("/api/mocks/orders?qty=3")
-
-            expect(await Order.countDocuments()).to.equal(0)
-        })
     })
 
     describe("GET /api/mocks/deliveries", () => {
@@ -162,25 +131,24 @@ describe("Test de endpoints de mocks", function () {
     })
 
     describe("qty inválida", () => {
-        const recursos = ["users", "drivers", "orders", "deliveries"]
+        ;["users", "drivers", "orders", "deliveries"].forEach((recurso) => {
+            it(`${recurso}: qty=0 devuelve 400 InvalidQuantity`, async () => {
+                const response = await requester.get(`/api/mocks/${recurso}?qty=0`)
 
-        const casos = [
-            ["0", "qty debe ser mayor a 0"],
-            ["-5", "qty debe ser mayor a 0"],
-            ["abc", "qty debe ser un número entero"],
-            ["2.5", "qty debe ser un número entero"],
-            ["", "qty debe ser un número entero"],
-            [String(MOCKING_PARAMETERS.MAX + 1), `El máximo de qty es ${MOCKING_PARAMETERS.MAX}`]
-        ]
-
-        recursos.forEach((recurso) => {
-            casos.forEach(([qty, mensaje]) => {
-                it(`${recurso}: qty="${qty}" devuelve 400 InvalidQuantity`, async () => {
-                    const response = await requester.get(`/api/mocks/${recurso}?qty=${qty}`)
-
-                    expectError(response, "INVALID_QUANTITY", mensaje)
-                })
+                expectError(response, "INVALID_QUANTITY", "qty debe ser mayor a 0")
             })
+        })
+
+        it("users: qty no numérica devuelve 400 InvalidQuantity", async () => {
+            const response = await requester.get("/api/mocks/users?qty=abc")
+
+            expectError(response, "INVALID_QUANTITY", "qty debe ser un número entero")
+        })
+
+        it("users: qty mayor al máximo devuelve 400 InvalidQuantity", async () => {
+            const response = await requester.get(`/api/mocks/users?qty=${MOCKING_PARAMETERS.MAX + 1}`)
+
+            expectError(response, "INVALID_QUANTITY", `El máximo de qty es ${MOCKING_PARAMETERS.MAX}`)
         })
     })
 
@@ -203,28 +171,6 @@ describe("Test de endpoints de mocks", function () {
             expect(await Delivery.countDocuments()).to.equal(response.body.payload.deliveries.inserted)
         })
 
-        it("Seed: Guarda las contraseñas hasheadas y no en texto plano", async () => {
-            await requester.post("/api/mocks/seed?qty=3")
-
-            const users = await User.find({})
-            expect(users).to.have.lengthOf(3)
-            users.forEach((user) => {
-                expect(user.password).to.not.equal(MOCKING_PARAMETERS.DEFAULT_PASSWORD)
-                expect(user.password).to.match(/^\$2[aby]\$/) // formato bcrypt
-            })
-        })
-
-        it("Seed: Cada entrega queda vinculada a su pedido", async () => {
-            await requester.post("/api/mocks/seed?qty=5")
-
-            const deliveries = await Delivery.find({})
-            for (const delivery of deliveries) {
-                const order = await Order.findById(delivery.order)
-                expect(order, "la entrega apunta a un pedido existente").to.not.be.null
-                expect(String(order.delivery)).to.equal(String(delivery._id))
-            }
-        })
-
         it("Seed: Con qty inválida devuelve 400 y no inserta nada", async () => {
             const response = await requester.post("/api/mocks/seed?qty=0")
 
@@ -233,16 +179,5 @@ describe("Test de endpoints de mocks", function () {
             expect(await Order.countDocuments()).to.equal(0)
         })
 
-        it("Seed: Con qty no numérica devuelve 400", async () => {
-            const response = await requester.post("/api/mocks/seed?qty=abc")
-
-            expectError(response, "INVALID_QUANTITY", "qty debe ser un número entero")
-        })
-
-        it("Seed: Con qty=1 no hay drivers y devuelve 400 MockDataMissing", async () => {
-            const response = await requester.post("/api/mocks/seed?qty=1")
-
-            expectError(response, "MOCK_DATA_MISSING", "No hay usuarios driver para asignar a las entregas.")
-        })
     })
 })

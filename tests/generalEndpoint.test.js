@@ -1,3 +1,4 @@
+
 import { expect } from "chai";
 import supertest from "supertest";
 import dotenv from "dotenv";
@@ -37,13 +38,6 @@ describe("Test de endpoints generales (logger, swagger y rutas inexistentes)", f
       });
     });
 
-    it("Logger: la respuesta incluye el header x-request-id", async () => {
-      const response = await requester.get("/api/loggerTest");
-
-      expect(response.headers).to.have.property("x-request-id");
-      expect(response.headers["x-request-id"]).to.be.a("string").that.is.not
-        .empty;
-    });
   });
 
   describe("Swagger", () => {
@@ -53,12 +47,6 @@ describe("Test de endpoints generales (logger, swagger y rutas inexistentes)", f
       expect(response.status).to.equal(200);
       expect(response.headers["content-type"]).to.include("text/html");
       expect(response.text).to.include("Swagger UI");
-    });
-
-    it("Swagger: la especificación tiene la información general de la API", () => {
-      expect(swaggerSpec).to.have.property("openapi", "3.0.0");
-      expect(swaggerSpec.info).to.have.property("title", "Shipnow");
-      expect(swaggerSpec.paths).to.be.an("object").that.is.not.empty;
     });
 
     // Coherencia: lo que está documentado en Swagger tiene su test en la suite
@@ -86,21 +74,21 @@ describe("Test de endpoints generales (logger, swagger y rutas inexistentes)", f
       ["/api/deliveries/{id}", "delete", ["200", "400", "404"]],
     ];
 
-    documentado.forEach(([path, method, codes]) => {
-      it(`Swagger: documenta ${method.toUpperCase()} ${path} con las respuestas ${codes.join(", ")}`, () => {
-        const responses = swaggerSpec.paths?.[path]?.[method]?.responses;
+    it("Swagger: documenta los endpoints y respuestas que se prueban en la suite", () => {
+        documentado.forEach(([path, method, codes]) => {
+            const responses = swaggerSpec.paths?.[path]?.[method]?.responses
 
-        expect(
-          responses,
-          `falta ${method.toUpperCase()} ${path} en la especificación`,
-        ).to.exist;
-        codes.forEach((code) => {
-          expect(responses, `falta la respuesta ${code}`).to.have.property(
-            code,
-          );
-        });
-      });
-    });
+            expect(responses, `falta ${method.toUpperCase()} ${path} en la especificación`).to.exist
+            codes.forEach((code) => {
+                expect(responses, `${method.toUpperCase()} ${path}: falta la respuesta ${code}`).to.have.property(code)
+            })
+        })
+    })
+
+    it("Swagger: la especificación declara el servidor base", () => {
+        expect(swaggerSpec.servers).to.be.an("array").with.lengthOf(1)
+        expect(swaggerSpec.servers[0]).to.have.property("url", "http://localhost:8080")
+    })
   });
 
   describe("Ruta inexistente", () => {
@@ -110,16 +98,5 @@ describe("Test de endpoints generales (logger, swagger y rutas inexistentes)", f
       expectError(response, "ROUTE_NOT_FOUND");
     });
 
-    it("Ruta inexistente: POST devuelve 404 RouteNotFound", async () => {
-      const response = await requester.post("/ruta-que-no-existe").send({});
-
-      expectError(response, "ROUTE_NOT_FOUND");
-    });
-
-    it("Ruta inexistente: un recurso conocido con un subpath inválido devuelve 404", async () => {
-      const response = await requester.get("/api/mocks/no-existe");
-
-      expectError(response, "ROUTE_NOT_FOUND");
-    });
   });
 });

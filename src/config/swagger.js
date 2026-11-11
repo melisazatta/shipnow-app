@@ -7,10 +7,11 @@ const options = {
             title:"Shipnow",
             version:"1.0.0",
             description:"Documentación de la API"
-        }
-    },
-    servers:[{url:"http://localhost:8080"}],
-    apis:["./src/routes/*.js"]
+        },
+        servers:[{url:"http://localhost:8080"}],
+
+    }, apis:["./src/routes/*.js"]
+   
 }
 
 export default swaggerJSDoc(options)

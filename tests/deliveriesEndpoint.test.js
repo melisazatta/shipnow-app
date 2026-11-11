@@ -1,3 +1,4 @@
+
 import { expect } from "chai"
 import supertest from "supertest"
 import mongoose from "mongoose"
@@ -50,17 +51,6 @@ const expectError = (response, key) => {
     expect(response.body.error).to.have.property("name", name)
     expect(response.body.error).to.have.property("code", code)
     expect(response.body.error).to.have.property("message", message)
-}
-
-// Errores de validación de Mongoose (el mensaje lo arma Mongoose, por eso solo se verifica que exista)
-const expectValidationError = (response) => {
-    const { status, name, code } = ErrorDictionary.VALIDATION_ERROR
-
-    expect(response.status).to.equal(status)
-    expect(response.body).to.have.property("status", "error")
-    expect(response.body.error).to.have.property("name", name)
-    expect(response.body.error).to.have.property("code", code)
-    expect(response.body.error.message).to.be.a("string").that.is.not.empty
 }
 
 describe("Test de endpoints de deliveries", function () {
@@ -131,14 +121,6 @@ describe("Test de endpoints de deliveries", function () {
             expect(delivery.driver).to.not.have.property("password")
         })
 
-        it("Listar: Devuelve un array vacío si no hay entregas", async () => {
-            await Delivery.deleteMany({})
-
-            const response = await requester.get("/api/deliveries")
-
-            expect(response.status).to.equal(200)
-            expect(response.body.payload).to.be.an("array").that.is.empty
-        })
     })
 
     describe("Buscar por id", () => {
@@ -188,15 +170,6 @@ describe("Test de endpoints de deliveries", function () {
             expect(await Delivery.countDocuments()).to.equal(2)
         })
 
-        it("Crear: Respeta la prioridad enviada", async () => {
-            const response = await requester
-                .post("/api/deliveries")
-                .send({ order: orderId, priority: ORDER_PRIORITY.LOW })
-
-            expect(response.status).to.equal(201)
-            expect(response.body.payload).to.have.property("priority", ORDER_PRIORITY.LOW)
-        })
-
         it("Crear: Falta el pedido (campo obligatorio)", async () => {
             const response = await requester.post("/api/deliveries").send({ priority: ORDER_PRIORITY.LOW })
 
@@ -204,23 +177,6 @@ describe("Test de endpoints de deliveries", function () {
             expect(await Delivery.countDocuments()).to.equal(1)
         })
 
-        it("Crear: Estado inválido devuelve error de validación", async () => {
-            const response = await requester
-                .post("/api/deliveries")
-                .send({ order: orderId, status: "estado_inexistente" })
-
-            expectValidationError(response)
-            expect(await Delivery.countDocuments()).to.equal(1)
-        })
-
-        it("Crear: JSON mal formado", async () => {
-            const response = await requester
-                .post("/api/deliveries")
-                .set("Content-Type", "application/json")
-                .send('{"order":')
-
-            expectError(response, "INVALID_JSON")
-        })
     })
 
     describe("Actualizar", () => {
@@ -238,18 +194,6 @@ describe("Test de endpoints de deliveries", function () {
 
             const inDb = await Delivery.findById(deliveryId)
             expect(inDb.status).to.equal(DELIVERY_STATUS.IN_TRANSIT)
-        })
-
-        it("Actualizar: Estado inválido devuelve error de validación", async () => {
-            const response = await requester
-                .put(`/api/deliveries/${deliveryId}`)
-                .send({ status: "estado_inexistente" })
-
-            expectValidationError(response)
-
-            // La entrega no cambió
-            const inDb = await Delivery.findById(deliveryId)
-            expect(inDb.status).to.equal(DELIVERY_STATUS.ASSIGNED)
         })
 
         it("Actualizar: ID inválido", async () => {

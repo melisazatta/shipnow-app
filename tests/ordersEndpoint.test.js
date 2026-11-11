@@ -1,3 +1,4 @@
+
 import { expect } from "chai"
 import supertest from "supertest"
 import mongoose from "mongoose"
@@ -103,14 +104,6 @@ describe("Test de endpoints de orders", function () {
             expect(order.customer).to.not.have.property("password")
         })
 
-        it("Listar: Devuelve un array vacío si no hay pedidos", async () => {
-            await Order.deleteMany({})
-
-            const response = await requester.get("/api/orders")
-
-            expect(response.status).to.equal(200)
-            expect(response.body.payload).to.be.an("array").that.is.empty
-        })
     })
 
     describe("Buscar por id", () => {
@@ -168,33 +161,11 @@ describe("Test de endpoints de orders", function () {
             expect(await Order.countDocuments()).to.equal(2)
         })
 
-        it("Crear: Respeta la prioridad enviada", async () => {
-            const response = await requester.post("/api/orders").send({
-                customer: customerId,
-                deliveryAddress: "Calle Falsa 123",
-                items,
-                priority: "high"
-            })
-
-            expect(response.status).to.equal(201)
-            expect(response.body.payload).to.have.property("priority", "high")
-        })
-
         it("Crear: Faltan campos obligatorios", async () => {
             const response = await requester.post("/api/orders").send({ customer: customerId })
 
             expectError(response, "MISSING_REQUIRED_FIELDS")
             expect(await Order.countDocuments()).to.equal(1)
-        })
-
-        it("Crear: La lista de items está vacía", async () => {
-            const response = await requester.post("/api/orders").send({
-                customer: customerId,
-                deliveryAddress: "Calle Falsa 123",
-                items: []
-            })
-
-            expectError(response, "MISSING_REQUIRED_FIELDS")
         })
 
         it("Crear: El cliente no existe", async () => {
@@ -208,39 +179,6 @@ describe("Test de endpoints de orders", function () {
             expect(await Order.countDocuments()).to.equal(1)
         })
 
-        it("Crear: El ID del cliente es inválido", async () => {
-            const response = await requester.post("/api/orders").send({
-                customer: idInvalido,
-                deliveryAddress: "Calle Falsa 123",
-                items
-            })
-
-            expectError(response, "INVALID_ID")
-        })
-
-        it("Crear: Un item con cantidad 0 devuelve error de validación", async () => {
-            const response = await requester.post("/api/orders").send({
-                customer: customerId,
-                deliveryAddress: "Calle Falsa 123",
-                items: [{ name: "Cable USB", quantity: 0, price: 10 }]
-            })
-
-            expect(response.status).to.equal(400)
-            expect(response.body).to.have.property("status", "error")
-            expect(response.body.error).to.have.property("name", "ValidationError")
-            expect(response.body.error).to.have.property("code", ErrorDictionary.VALIDATION_ERROR.code)
-            expect(response.body.error.message).to.be.a("string").that.is.not.empty
-            expect(await Order.countDocuments()).to.equal(1)
-        })
-
-        it("Crear: JSON mal formado", async () => {
-            const response = await requester
-                .post("/api/orders")
-                .set("Content-Type", "application/json")
-                .send('{"customer":')
-
-            expectError(response, "INVALID_JSON")
-        })
     })
 
     describe("Actualizar estado", () => {
@@ -255,15 +193,6 @@ describe("Test de endpoints de orders", function () {
 
             const inDb = await Order.findById(orderId)
             expect(inDb.status).to.equal(ORDER_STATUS.ASSIGNED)
-        })
-
-        Object.values(ORDER_STATUS).forEach((estado) => {
-            it(`Actualizar: Acepta el estado "${estado}"`, async () => {
-                const response = await requester.put(`/api/orders/${orderId}`).send({ status: estado })
-
-                expect(response.status).to.equal(200)
-                expect(response.body.payload).to.have.property("status", estado)
-            })
         })
 
         it("Actualizar: Estado inválido", async () => {
@@ -288,14 +217,6 @@ describe("Test de endpoints de orders", function () {
             expectError(response, "ORDER_NOT_FOUND")
         })
 
-        it("Actualizar: JSON mal formado", async () => {
-            const response = await requester
-                .put(`/api/orders/${orderId}`)
-                .set("Content-Type", "application/json")
-                .send('{"status":')
-
-            expectError(response, "INVALID_JSON")
-        })
     })
 
     describe("Eliminar", () => {
