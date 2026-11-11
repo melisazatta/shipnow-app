@@ -159,3 +159,46 @@ La API cuenta con documentación interactiva mediante Swagger UI, disponible en:
 Permite consultar y probar los endpoints de los módulos **Users, Orders, Deliveries, Mocks y Logger**, incluyendo parámetros, cuerpos de petición, respuestas y errores.
 
 La documentación utiliza OpenAPI y schemas reutilizables.
+
+## Testing
+
+### Herramientas
+- **Mocha**: organiza y ejecuta los tests.
+- **Chai**: aserciones (`expect`).
+- **Supertest**: peticiones HTTP contra la app Express, sin abrir un puerto
+  (`app.js` está separado de `server.js`).
+
+### Cómo ejecutar los tests
+```bash
+npm install
+npm test
+```
+`npm test` fija `NODE_ENV=test`, silencia los logs y corre `tests/**/*.test.js`.
+
+### Módulos cubiertos
+| Archivo | Cubre |
+|---|---|
+| `tests/usersEndpoint.test.js` | Usuarios: crear, listar, buscar por ID, actualizar, eliminar |
+| `tests/ordersEndpoint.test.js` | Pedidos: listar, crear, buscar por ID, actualizar estado, eliminar |
+| `tests/deliveriesEndpoint.test.js`|	Entregas: listar, crear, buscar por ID, actualizar, eliminar |
+| `tests/mocksEndpoint.test.js` | Mocks (users, drivers, orders, deliveries) y `POST /api/mocks/seed` |
+| `tests/generalEndpoint.test.js` | Logger, Swagger (`/api/docs/`) y rutas inexistentes |
+
+Cada recurso tiene casos exitosos y de error (datos incompletos, recurso inexistente, estado inválido, qty inválida, ruta inexistente). En los errores se valida el status HTTP y el formato { status, error: { name, code, message } } definido en src/utils/errors.js. También se verifica que Swagger documente los comportamientos probados.
+
+### Base de datos de testing
+**Sí, se requiere una base separada.** Los tests usan `MONGODB_URI_TEST`, que debe
+apuntar a una base cuyo nombre termine en `_test` (por ejemplo `shipnow_test`).
+Si no termina en `_test`, los tests se abortan antes de borrar nada.
+
+Los datos se crean dentro de cada test y se limpian con hooks
+(`before` / `beforeEach` / `after`), por lo que la suite es repetible.
+
+### Variables de entorno necesarias
+| Variable | Descripción |
+|---|---|
+| `PORT` | Puerto de la app |
+| `NODE_ENV` | `development` o `production` (`npm test` fija `test` solo) |
+| `JWT_SECRET` | Secreto de la app |
+| `MONGODB_URI` | Base de desarrollo |
+| `MONGODB_URI_TEST` | Base de testing (nombre terminado en `_test`) |

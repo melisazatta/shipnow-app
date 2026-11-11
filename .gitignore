@@ -4,3 +4,7 @@ node_modules
 # Logs
 logs/
 *.log
+
+
+tests/user.test.js
+tests/orders.test.js

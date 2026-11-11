@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cross-env NODE_ENV=test LOG_LEVEL=fatal mocha \"tests/**/*.test.js\" --timeout 10000 --exit"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -23,6 +23,10 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^10.6.0",
-    "nodemon": "^3.1.14"
+    "chai": "^6.3.0",
+    "cross-env": "^10.1.0",
+    "mocha": "^12.0.3",
+    "nodemon": "^3.1.14",
+    "supertest": "^7.3.2"
   }
 }
