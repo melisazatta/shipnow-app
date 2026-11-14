@@ -1,10 +1,11 @@
 import { Router } from "express"
 import UserController from "../controllers/user.controller.js"
+import { uploadDocument } from "../middlewares/uploadMiddleware.js"
  
 const userController = new UserController()
 const router = Router()
  
- 
+
 /**
  * @openapi
  * components:
@@ -33,8 +34,9 @@ const router = Router()
  *           example: true
  *         documents:
  *           type: array
+ *           description: Metadatos de los documentos cargados (el archivo queda en el servidor)
  *           items:
- *             type: object
+ *             $ref: '#/components/schemas/UserDocument'
  *           example: []
  *         createdAt:
  *           type: string
@@ -64,6 +66,176 @@ const router = Router()
  *               type: string
  */
  
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     UserDocument:
+ *       type: object
+ *       properties:
+ *         originalName:
+ *           type: string
+ *           description: Nombre original del archivo
+ *           example: dni.pdf
+ *         fileName:
+ *           type: string
+ *           description: Nombre generado al guardarlo en el servidor
+ *           example: 1794447402737-718501861.pdf
+ *         path:
+ *           type: string
+ *           description: Ruta del archivo en el servidor
+ *           example: uploads/documents/1794447402737-718501861.pdf
+ *         mimeType:
+ *           type: string
+ *           example: application/pdf
+ *         size:
+ *           type: integer
+ *           description: Tamaño en bytes
+ *           example: 48213
+ *         type:
+ *           type: string
+ *           description: Tipo de documento
+ *           enum: [driver_license, user_document]
+ *           example: user_document
+ *         uploadedAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2026-11-12T15:20:11.391Z"
+ */
+ 
+/**
+ * @openapi
+ * /api/users/{id}/documents:
+ *   post:
+ *     summary: Subir un documento de usuario
+ *     description: >
+ *       Recibe un archivo como `multipart/form-data` en el campo `document`, lo
+ *       guarda en el servidor (`uploads/documents`) y registra sus metadatos en
+ *       el usuario. Formatos aceptados: PDF, JPG y PNG. Tamaño máximo: 5 MB.
+ *       Solo se guardan los metadatos en la base, nunca el archivo. La licencia
+ *       de conducir (`driver_license`) solo la puede subir un usuario con rol
+ *       `driver`.
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: 6ad6b1eb0f2bce6b04fb30aa
+ *         description: ID del usuario
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [document]
+ *             properties:
+ *               document:
+ *                 type: string
+ *                 format: binary
+ *                 description: Archivo del documento (PDF, JPG o PNG, máximo 5 MB)
+ *               type:
+ *                 type: string
+ *                 enum: [driver_license, user_document]
+ *                 default: user_document
+ *                 description: Tipo de documento. Si no se envía, se toma `user_document`.
+ *     responses:
+ *       200:
+ *         description: Documento subido. Devuelve el usuario actualizado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Documento subido exitosamente
+ *                 payload:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: >
+ *           No se envió el archivo (`FileRequired`), el tipo de documento no es
+ *           válido (`InvalidDocumentType`), el campo del archivo no es
+ *           `document` (`UnexpectedFileField`) o el ID no es válido
+ *           (`InvalidId`).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               status: error
+ *               error:
+ *                 name: InvalidDocumentType
+ *                 code: 6
+ *                 message: Tipo de documento inválido
+ *       403:
+ *         description: Un usuario que no es driver no puede subir una licencia de conducir
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               status: error
+ *               error:
+ *                 name: DocumentNotAllowed
+ *                 code: 6
+ *                 message: Este usuario no puede subir ese tipo de documento
+ *       404:
+ *         description: Usuario no encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               status: error
+ *               error:
+ *                 name: UserNotFound
+ *                 code: 4
+ *                 message: Usuario no encontrado
+ *       413:
+ *         description: El archivo supera el tamaño máximo permitido (5 MB)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               status: error
+ *               error:
+ *                 name: FileTooLarge
+ *                 code: 6
+ *                 message: El archivo supera el tamaño máximo permitido (5 MB)
+ *       415:
+ *         description: Tipo de archivo no permitido (solo PDF, JPG y PNG)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               status: error
+ *               error:
+ *                 name: InvalidFileType
+ *                 code: 2
+ *                 message: "Tipo de archivo no permitido. Formatos aceptados: PDF, JPG y PNG"
+ *       500:
+ *         description: Error al guardar el archivo en el servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               status: error
+ *               error:
+ *                 name: FileSaveError
+ *                 code: 8
+ *                 message: Error al guardar el archivo en el servidor
+ */
+router.post("/:id/documents", uploadDocument.single("document"), userController.uploadDocument)
+
 /**
  * @openapi
  * /api/users:

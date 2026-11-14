@@ -12,6 +12,7 @@ import { loggerHttp } from './middlewares/HttpLogger.js'
 import loggerRouter from './routes/logger.js'
 import swaggerUI from "swagger-ui-express"
 import swaggerSpec from "./config/swagger.js"
+import path from "path"
 
 const app = express()
 
@@ -19,6 +20,8 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true}))
 
 app.use(loggerHttp)
+
+// app.use("/uploads", express.static(path.resolve("uploads")))
 app.use("/api/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec))
 
 app.use("/api/users", usersRouter);

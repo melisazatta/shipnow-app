@@ -72,6 +72,8 @@ describe("Test de endpoints generales (logger, swagger y rutas inexistentes)", f
       ["/api/deliveries", "post", ["201", "400"]],
       ["/api/deliveries/{id}", "put", ["200", "400", "404"]],
       ["/api/deliveries/{id}", "delete", ["200", "400", "404"]],
+      ["/api/users/{id}/documents", "post", ["200", "400", "403", "404", "413", "415", "500"]],
+      ["/api/deliveries/{id}/proof", "post", ["200", "400", "404", "413", "415", "500"]],
     ];
 
     it("Swagger: documenta los endpoints y respuestas que se prueban en la suite", () => {

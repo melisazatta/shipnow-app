@@ -42,3 +42,28 @@ export const DELIVERY_STATUS = Object.freeze({
   IN_TRANSIT: "in_transit",
   DELIVERED: "delivered"
 })
+
+// constantes Multer
+
+export const DOCUMENT_TYPES = Object.freeze({
+  DRIVER_LICENSE: "driver_license",
+  USER_DOCUMENT: "user_document"
+})
+
+// Configuración de carga de archivos
+export const UPLOAD_CONFIG = Object.freeze({
+  MAX_FILE_SIZE: 5 * 1024 * 1024, // 5 MB
+  ALLOWED_MIME_TYPES: Object.freeze(["application/pdf", "image/jpeg", "image/png"]),
+  // Subcarpetas dentro de la carpeta de uploads
+  FOLDERS: Object.freeze({
+    DOCUMENTS: "documents", // documentos y licencias de usuario
+    RECEIPTS: "receipts",   // comprobantes de pedidos
+    PROOFS: "proofs"        // comprobantes de entrega
+  })
+})
+
+// Tipo de documento de los comprobantes de entrega
+export const PROOF_TYPES = Object.freeze({
+  DELIVERY_PROOF: "delivery_proof"
+})
+ 

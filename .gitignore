@@ -5,6 +5,8 @@ node_modules
 logs/
 *.log
 
+# Archivos subidos con Multer (no van al repo)
+uploads/
 
 tests/user.test.js
 tests/orders.test.js

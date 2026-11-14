@@ -1,8 +1,30 @@
+import fs from "fs"
+
 import UserService from "../services/user.service.js";
 
 class UserController{
     constructor(){
         this.UserService = new UserService()
+    }
+
+    uploadDocument = async(req, res, next) =>{
+    try {
+    //   console.log(req.file)
+      const updatedUser = await this.UserService.addDocument(
+        req.params.id,
+        req.file,
+        req.body?.type
+      )
+       return res.status(200).json({
+                status: "success",
+                message: "Documento subido exitosamente",
+                payload: updatedUser
+            })
+        } catch (error) {
+            // Multer ya guardó el archivo: si algo falló, no debe quedar huérfano en disco
+            if (req.file) await fs.promises.unlink(req.file.path).catch(() => {})
+            next(error)
+        }
     }
 
      getAll = async(req, res, next)=>{

@@ -17,7 +17,10 @@ const config = {
     mongoUri: isTest ? process.env.MONGODB_URI_TEST : process.env.MONGODB_URI,
     jwtSecret: process.env.JWT_SECRET,
     environment: process.env.NODE_ENV,
-    logLevel: process.env.LOG_LEVEL || (process.env.NODE_ENV === "production" ? "info" : "debug")
+    logLevel: process.env.LOG_LEVEL || (process.env.NODE_ENV === "production" ? "info" : "debug"),
+
+    // Los tests suben a una subcarpeta aparte para no mezclarse con los archivos reales
+    uploadsDir: process.env.UPLOADS_DIR || (isTest ? "uploads/test" : "uploads")
 }
 
 export default config

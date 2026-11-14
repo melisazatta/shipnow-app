@@ -2,6 +2,8 @@
 import { Router } from "express";
 import DeliveryController from "../controllers/delivery.controller.js";
 
+import { uploadProof } from "../middlewares/uploadMiddleware.js";
+ 
 const deliveryController = new DeliveryController();
 const router = Router();
 
@@ -81,6 +83,11 @@ const router = Router();
  *           format: date-time
  *           nullable: true
  *           example: null
+ *         proofs:
+ *           type: array
+ *           description: Metadatos de los comprobantes de entrega (el archivo queda en el servidor)
+ *           items:
+ *             $ref: '#/components/schemas/DeliveryProof'
  *         createdAt:
  *           type: string
  *           format: date-time
@@ -92,6 +99,36 @@ const router = Router();
  *         __v:
  *           type: integer
  *           example: 0
+ *     DeliveryProof:
+ *       type: object
+ *       properties:
+ *         originalName:
+ *           type: string
+ *           description: Nombre original del archivo
+ *           example: comprobante-firmado.pdf
+ *         fileName:
+ *           type: string
+ *           description: Nombre generado al guardarlo en el servidor
+ *           example: 1794449765149-586089037.pdf
+ *         path:
+ *           type: string
+ *           description: Ruta del archivo en el servidor
+ *           example: uploads/proofs/1794449765149-586089037.pdf
+ *         mimeType:
+ *           type: string
+ *           example: application/pdf
+ *         size:
+ *           type: integer
+ *           description: Tamaño en bytes
+ *           example: 48213
+ *         type:
+ *           type: string
+ *           enum: [delivery_proof]
+ *           example: delivery_proof
+ *         uploadedAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2026-11-12T15:20:11.391Z"
  */
 
 /**
@@ -343,5 +380,117 @@ router.put("/:id", deliveryController.update);
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.delete("/:id", deliveryController.delete);
+
+/**
+ * @openapi
+ * /api/deliveries/{id}/proof:
+ *   post:
+ *     summary: Subir el comprobante de entrega
+ *     description: >
+ *       Recibe un archivo como `multipart/form-data` en el campo `proof`, lo
+ *       guarda en el servidor (`uploads/proofs`) y registra sus metadatos en la
+ *       entrega. Formatos aceptados: PDF, JPG y PNG. Tamaño máximo: 5 MB.
+ *       Solo se guardan los metadatos en la base, nunca el archivo.
+ *     tags: [Deliveries]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: 6aeadef9eff017f303961a4a
+ *         description: ID de la entrega
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [proof]
+ *             properties:
+ *               proof:
+ *                 type: string
+ *                 format: binary
+ *                 description: Archivo del comprobante (PDF, JPG o PNG, máximo 5 MB)
+ *     responses:
+ *       200:
+ *         description: Comprobante subido. Devuelve la entrega actualizada.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Comprobante subido exitosamente
+ *                 payload:
+ *                   $ref: '#/components/schemas/Delivery'
+ *       400:
+ *         description: >
+ *           No se envió el archivo (`FileRequired`), el campo del archivo no es
+ *           `proof` (`UnexpectedFileField`) o el ID no es válido (`InvalidId`).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               status: error
+ *               error:
+ *                 name: FileRequired
+ *                 code: 6
+ *                 message: Se requiere un archivo
+ *       404:
+ *         description: Entrega no encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               status: error
+ *               error:
+ *                 name: DeliveryNotFound
+ *                 code: 4
+ *                 message: Entrega no encontrada
+ *       413:
+ *         description: El archivo supera el tamaño máximo permitido (5 MB)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               status: error
+ *               error:
+ *                 name: FileTooLarge
+ *                 code: 6
+ *                 message: El archivo supera el tamaño máximo permitido (5 MB)
+ *       415:
+ *         description: Tipo de archivo no permitido (solo PDF, JPG y PNG)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               status: error
+ *               error:
+ *                 name: InvalidFileType
+ *                 code: 2
+ *                 message: "Tipo de archivo no permitido. Formatos aceptados: PDF, JPG y PNG"
+ *       500:
+ *         description: Error al guardar el archivo en el servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               status: error
+ *               error:
+ *                 name: FileSaveError
+ *                 code: 8
+ *                 message: Error al guardar el archivo en el servidor
+ */
+router.post("/:id/proof", uploadProof.single("proof"), deliveryController.uploadProof);
 
 export default router;

@@ -1,3 +1,5 @@
+import { UPLOAD_CONFIG } from "../constants/index.js"
+
 export const EErrors = {
   ROUTING_ERROR:1,
   INVALID_TYPES_ERROR:2,
@@ -6,6 +8,7 @@ export const EErrors = {
   RESOURCE_ALREADY_EXISTS:5,
   INVALID_RESOURSE_PROPERTY:6,
   MISSING_API_KEY:7,
+  FILE_STORAGE_ERROR:8,
 }
 
 export const ErrorDictionary = {
@@ -46,6 +49,23 @@ export const ErrorDictionary = {
   MOCK_DATA_MISSING: { name:"MockDataMissing", code:EErrors.INVALID_RESOURSE_PROPERTY, status: 400, message: "Faltan datos previos para generar los mocks" },
 
   DATABASE_ERROR: { name: "DatabaseError", code: EErrors.DATABASE_ERROR, status: 500, message: "Error al guardar los datos en la base de datos" },
+
+  // Errores Multer
+  FILE_REQUIRED: { name: "FileRequired", code: EErrors.INVALID_RESOURSE_PROPERTY, status: 400, message: "Se requiere un archivo" },
+
+INVALID_FILE_TYPE: { name: "InvalidFileType", code: EErrors.INVALID_TYPES_ERROR, status: 415, message: "Tipo de archivo no permitido. Formatos aceptados: PDF, JPG y PNG" },
+ 
+  FILE_TOO_LARGE: { name: "FileTooLarge", code: EErrors.INVALID_RESOURSE_PROPERTY, status: 413, message: `El archivo supera el tamaño máximo permitido (${UPLOAD_CONFIG.MAX_FILE_SIZE / 1024 / 1024} MB)` },
+ 
+  UNEXPECTED_FILE_FIELD: { name: "UnexpectedFileField", code: EErrors.INVALID_RESOURSE_PROPERTY, status: 400, message: "El campo del archivo enviado no es el esperado" },
+ 
+  FILE_UPLOAD_ERROR: { name: "FileUploadError", code: EErrors.INVALID_RESOURSE_PROPERTY, status: 400, message: "No se pudo procesar la carga del archivo" },
+ 
+  FILE_SAVE_ERROR: { name: "FileSaveError", code: EErrors.FILE_STORAGE_ERROR, status: 500, message: "Error al guardar el archivo en el servidor" },
+ 
+  INVALID_DOCUMENT_TYPE: { name: "InvalidDocumentType", code: EErrors.INVALID_RESOURSE_PROPERTY, status: 400, message: "Tipo de documento inválido" },
+ 
+  DOCUMENT_NOT_ALLOWED: { name: "DocumentNotAllowed", code: EErrors.INVALID_RESOURSE_PROPERTY, status: 403, message: "Este usuario no puede subir ese tipo de documento" },
 }
 
 

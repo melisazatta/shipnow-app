@@ -26,6 +26,17 @@ class DeliveryRepository {
         );
     }
 
+     // $push agrega el comprobante sin pisar el resto; devuelve la entrega actualizada y populada
+    async addProof(id, proof) {
+        return Delivery.findByIdAndUpdate(
+            id,
+            { $push: { proofs: proof } },
+            { returnDocument: "after", runValidators: true }
+        )
+            .populate("order")
+            .populate("driver", "firstName lastName email");
+    }
+
     async delete(id) {
         return Delivery.findByIdAndDelete(id);
     }

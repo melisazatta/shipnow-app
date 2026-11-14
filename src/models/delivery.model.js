@@ -1,5 +1,16 @@
 import mongoose from 'mongoose';
-import { DELIVERY_STATUS, ORDER_PRIORITY } from '../constants/index.js';
+import { DELIVERY_STATUS, ORDER_PRIORITY, PROOF_TYPES } from '../constants/index.js';
+
+// Metadatos del comprobante: el archivo en sí queda en disco, no en la base
+const proofSchema = new mongoose.Schema({
+  originalName: { type: String, required: true },
+  fileName: { type: String, required: true },
+  path: { type: String, required: true },
+  mimeType: { type: String, required: true },
+  size: { type: Number, required: true },
+  type: { type: String, enum: Object.values(PROOF_TYPES), default: PROOF_TYPES.DELIVERY_PROOF },
+  uploadedAt: { type: Date, default: Date.now }
+}, { _id: false });
 
 const deliverySchema = new mongoose.Schema({
   order: {
@@ -27,6 +38,10 @@ const deliverySchema = new mongoose.Schema({
   deliveredAt: {
     type: Date,
     default: null
+  },
+  proofs: {
+    type: [proofSchema],
+    default: []
   }
 }, {
   timestamps: true

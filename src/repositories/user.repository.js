@@ -17,6 +17,15 @@ class UserRepository {
         return User.findByIdAndUpdate(id, userData, {new: true,  runValidators: true}).select("-password")
     }
 
+    // $push agrega el documento sin leer ni pisar el resto del arreglo
+    async addDocument(id, document){
+        return User.findByIdAndUpdate(
+            id,
+            { $push: { documents: document } },
+            { returnDocument: "after", runValidators: true }
+        ).select("-password")
+    }
+
     async findByEmail(email) {
     return User.findOne({ email });
   }
