@@ -125,7 +125,7 @@ uploads/
 └── proofs/      comprobantes de entrega
 ```
 
-`uploads/` está en `.gitignore`: los archivos subidos no se suben al repositorio. Las carpetas se crean solas al iniciar la aplicación. Los archivos **no se sirven públicamente por URL**.
+`uploads/` está en `.gitignore`: los archivos subidos no se suben al repositorio. Las carpetas se crean solas al iniciar la aplicación.
 
 ### Metadatos que se guardan
 
